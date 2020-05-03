@@ -4,16 +4,20 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.DefaultEditorKit.CutAction;
 
+import DataAccess.ComboBoxData;
 import DataAccess.CustomerDao;
 import DataAccess.ProductDao;
 import Helpers.InputValidation;
 import Models.Customer;
+import Models.Product;
 import Models.Staff;
 import java.awt.CardLayout;
 import javax.swing.JLabel;
@@ -79,6 +83,25 @@ public class App extends JFrame {
 			lblLogoCityNameProfile, lblCustomerDetailsProfile;
 	private JButton btnIssueNewRentalProfile, btnViewIssuedRentalsProfile, btnGoToHomeProfile, btnRedeemLoyaltyPoints;
 
+	// Search Title
+	private JPanel SearchTitle, TitleTablePanelSrchTitle, LogoPanelSrchTitle;
+	private JLabel lblSearchTitleSrchTitle, lblLogoNameSrchTitle, lblLogoCityNameSrchTitle;
+	private JButton btnGoToHomeSrchTitle;
+	private JScrollPane TitleScrollPaneSrchTitle;
+	private JTable TitleTableSrchTitle;
+
+	// Add Title
+	private JPanel AddTitle, GenrePanelAddTitle, DirectorPanelAddTitle, TitlePanelAddTitle, TitleTypePanelAddTitle,
+			ReleaseYearPanelAddTitle, QuantityPanelAddTitle, DescriptionPanelAddTitle, TitleDetailsPanelAddTitle,
+			ManufacturerPanelAddTitle, ModelPanelAddTitle, BandPanelAddTitle, OrganiserPanelAddTitle,
+			FormatTypePanelAddTitle, LogoPanelAddTitle;;
+	private JLabel lblAddTitle, lblGenre, lblTitle, lblLogoNameAddTitle, lblLogoCityNameAddTitle, lblQuantity, lblModel,
+			lblManufacturer, lblBand, lblOrganiser, lblFormatType, lblDirector, lblTitleDetails, lblTitleType;;
+	private JButton btnAddAddTitle, btnGoToHomeAddTitle, btnResetFieldsAddTitle;
+	private JTextField titleField, yearField, genreField, directorField, quantityField, modelField, manufacturerField,
+			bandField, organiserField;
+	private JComboBox<String> FormatTypeCombo, TitleTypeCombo;
+
 	// Initializations
 	String[] accesslvl = { "--Select Access Level Type--", "Music Lovers", "Premium", "TV Lover", "Video Lovers" };
 	String[] subscription = { "--Select Subscription Type--", "Basic", "Delux", "Premium", "Standard" };
@@ -93,6 +116,7 @@ public class App extends JFrame {
 	boolean redeemFlag = false;
 
 	private CustomerDao customerDao = new CustomerDao();
+	private ProductDao productDao = new ProductDao();
 
 	private InputValidation inputValidation;
 
@@ -541,7 +565,7 @@ public class App extends JFrame {
 
 		btnRedeemLoyaltyPoints.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+
 			}
 		});
 		btnRedeemLoyaltyPoints.setBounds(257, 90, 165, 23);
@@ -638,6 +662,7 @@ public class App extends JFrame {
 		btnIssueNewRentalProfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
+				
 			}
 		});
 
@@ -655,7 +680,7 @@ public class App extends JFrame {
 		btnViewIssuedRentalsProfile = new JButton("View Issued \r\nRentals");
 		btnViewIssuedRentalsProfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 			}
 		});
 		btnViewIssuedRentalsProfile.setBounds(524, 258, 140, 25);
@@ -810,6 +835,523 @@ public class App extends JFrame {
 		LogoPanelEditCust.add(lblLogoCityNameEditCust);
 	}
 
+	public void SearchTitleGUI() {
+
+		SearchTitle = new JPanel();
+		layeredPane.add(SearchTitle, "name_2406822016214400");
+		SearchTitle.setLayout(null);
+
+		lblSearchTitleSrchTitle = new JLabel("Search Title");
+		lblSearchTitleSrchTitle.setFont(new Font("Tahoma", Font.BOLD, 26));
+		lblSearchTitleSrchTitle.setBounds(10, 11, 165, 40);
+		SearchTitle.add(lblSearchTitleSrchTitle);
+
+		TitleTablePanelSrchTitle = new JPanel();
+		TitleTablePanelSrchTitle.setBounds(10, 130, 534, 208);
+		SearchTitle.add(TitleTablePanelSrchTitle);
+		TitleTablePanelSrchTitle.setLayout(null);
+
+		TitleScrollPaneSrchTitle = new JScrollPane();
+		TitleScrollPaneSrchTitle.setBounds(0, 0, 534, 208);
+		TitleTablePanelSrchTitle.add(TitleScrollPaneSrchTitle);
+
+		TitleTableSrchTitle = new JTable();
+		TitleScrollPaneSrchTitle.setViewportView(TitleTableSrchTitle);
+
+		btnGoToHomeSrchTitle = new JButton("Go to Home");
+		btnGoToHomeSrchTitle.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				switchPanels(Home);
+			}
+		});
+		btnGoToHomeSrchTitle.setBounds(554, 219, 110, 25);
+		SearchTitle.add(btnGoToHomeSrchTitle);
+
+		LogoPanelSrchTitle = new JPanel();
+		LogoPanelSrchTitle.setLayout(null);
+		LogoPanelSrchTitle.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "",
+
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		LogoPanelSrchTitle.setBounds(432, 11, 232, 95);
+		SearchTitle.add(LogoPanelSrchTitle);
+
+		lblLogoNameSrchTitle = new JLabel("Ultra-Vision");
+		lblLogoNameSrchTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogoNameSrchTitle.setFont(new Font("Segoe Script", Font.BOLD, 30));
+		lblLogoNameSrchTitle.setBounds(6, 16, 220, 49);
+		LogoPanelSrchTitle.add(lblLogoNameSrchTitle);
+
+		lblLogoCityNameSrchTitle = new JLabel("Dublin.");
+		lblLogoCityNameSrchTitle.setFont(new Font("Segoe Print", Font.PLAIN, 14));
+		lblLogoCityNameSrchTitle.setBounds(177, 62, 49, 26);
+		LogoPanelSrchTitle.add(lblLogoCityNameSrchTitle);
+
+	}
+
+	public void AddTitleGUI() {
+		AddTitle = new JPanel();
+		layeredPane.add(AddTitle, "name_2409423209601400");
+		AddTitle.setLayout(null);
+
+		lblAddTitle = new JLabel("Add Title");
+		lblAddTitle.setFont(new Font("Tahoma", Font.BOLD, 26));
+		lblAddTitle.setBounds(10, 11, 120, 32);
+		AddTitle.add(lblAddTitle);
+
+		LogoPanelAddTitle = new JPanel();
+		LogoPanelAddTitle.setLayout(null);
+		LogoPanelAddTitle.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "",
+
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		LogoPanelAddTitle.setBounds(424, 11, 232, 95);
+		AddTitle.add(LogoPanelAddTitle);
+
+		lblLogoNameAddTitle = new JLabel("Ultra-Vision");
+		lblLogoNameAddTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogoNameAddTitle.setFont(new Font("Segoe Script", Font.BOLD, 30));
+		lblLogoNameAddTitle.setBounds(6, 16, 220, 49);
+		LogoPanelAddTitle.add(lblLogoNameAddTitle);
+
+		lblLogoCityNameAddTitle = new JLabel("Dublin.");
+		lblLogoCityNameAddTitle.setFont(new Font("Segoe Print", Font.PLAIN, 14));
+		lblLogoCityNameAddTitle.setBounds(177, 62, 49, 26);
+		LogoPanelAddTitle.add(lblLogoCityNameAddTitle);
+
+		TitleDetailsPanelAddTitle = new JPanel();
+		TitleDetailsPanelAddTitle.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
+		TitleDetailsPanelAddTitle.setBounds(10, 144, 534, 194);
+		AddTitle.add(TitleDetailsPanelAddTitle);
+		TitleDetailsPanelAddTitle.setLayout(null);
+
+		TitlePanelAddTitle = new JPanel();
+		TitlePanelAddTitle.setBounds(5, 5, 248, 21);
+		TitleDetailsPanelAddTitle.add(TitlePanelAddTitle);
+		TitlePanelAddTitle.setLayout(null);
+
+		lblTitle = new JLabel("Title");
+		lblTitle.setBounds(0, 0, 120, 20);
+		TitlePanelAddTitle.add(lblTitle);
+		lblTitle.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		titleField = new JTextField();
+		titleField.setBounds(118, 1, 130, 20);
+		TitlePanelAddTitle.add(titleField);
+		titleField.setColumns(10);
+
+		DescriptionPanelAddTitle = new JPanel();
+		DescriptionPanelAddTitle.setBounds(279, 5, 250, 60);
+		TitleDetailsPanelAddTitle.add(DescriptionPanelAddTitle);
+		DescriptionPanelAddTitle.setLayout(null);
+
+		JLabel lblDescription = new JLabel("Description");
+		lblDescription.setBounds(0, 0, 120, 60);
+		DescriptionPanelAddTitle.add(lblDescription);
+		lblDescription.setVerticalAlignment(SwingConstants.TOP);
+		lblDescription.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		JTextArea dscpText = new JTextArea();
+		dscpText.setBounds(120, 0, 130, 60);
+		DescriptionPanelAddTitle.add(dscpText);
+
+		ReleaseYearPanelAddTitle = new JPanel();
+		ReleaseYearPanelAddTitle.setBounds(5, 44, 250, 21);
+		TitleDetailsPanelAddTitle.add(ReleaseYearPanelAddTitle);
+		ReleaseYearPanelAddTitle.setLayout(null);
+
+		JLabel lblReleaseYear = new JLabel("Release Year");
+		lblReleaseYear.setBounds(0, 0, 120, 20);
+		ReleaseYearPanelAddTitle.add(lblReleaseYear);
+		lblReleaseYear.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		yearField = new JTextField();
+		yearField.setBounds(120, 0, 130, 20);
+		ReleaseYearPanelAddTitle.add(yearField);
+		yearField.setColumns(10);
+
+		QuantityPanelAddTitle = new JPanel();
+		QuantityPanelAddTitle.setBounds(5, 76, 250, 21);
+		TitleDetailsPanelAddTitle.add(QuantityPanelAddTitle);
+		QuantityPanelAddTitle.setLayout(null);
+
+		lblQuantity = new JLabel("Quantity");
+		lblQuantity.setBounds(0, 0, 120, 20);
+		QuantityPanelAddTitle.add(lblQuantity);
+		lblQuantity.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		quantityField = new JTextField();
+		quantityField.setBounds(120, 0, 130, 20);
+		QuantityPanelAddTitle.add(quantityField);
+		quantityField.setColumns(10);
+
+		TitleTypePanelAddTitle = new JPanel();
+		TitleTypePanelAddTitle.setBounds(279, 76, 250, 21);
+		TitleDetailsPanelAddTitle.add(TitleTypePanelAddTitle);
+		TitleTypePanelAddTitle.setLayout(null);
+
+		lblTitleType = new JLabel("Title Type");
+		lblTitleType.setBounds(0, 0, 120, 20);
+		TitleTypePanelAddTitle.add(lblTitleType);
+		lblTitleType.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		TitleTypeCombo = new JComboBox<String>(new ComboBoxData().getTitleType());
+		TitleTypeCombo.setBounds(120, 0, 130, 20);
+		TitleTypePanelAddTitle.add(TitleTypeCombo);
+		TitleTypeCombo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String title = TitleTypeCombo.getSelectedItem().toString();
+				if (TitleTypeCombo.getSelectedIndex() == 4) {
+					GenrePanelAddTitle.setVisible(true);
+					GenrePanelAddTitle.setLocation(5, 108);
+
+					FormatTypePanelAddTitle.setVisible(true);
+					FormatTypePanelAddTitle.setLocation(279, 108);
+
+					DirectorPanelAddTitle.setVisible(true);
+					DirectorPanelAddTitle.setLocation(145, 137);
+
+					modelField.setText(null);
+					manufacturerField.setText(null);
+					bandField.setText(null);
+					organiserField.setText(null);
+					genreField.setText(null);
+					directorField.setText(null);
+					FormatTypeCombo.setSelectedIndex(0);
+					// *********************************
+					ManufacturerPanelAddTitle.setVisible(false);
+					ModelPanelAddTitle.setVisible(false);
+					BandPanelAddTitle.setVisible(false);
+					OrganiserPanelAddTitle.setVisible(false);
+				} else if (TitleTypeCombo.getSelectedIndex() == 2) {
+					GenrePanelAddTitle.setVisible(true);
+					GenrePanelAddTitle.setLocation(5, 108);
+
+					FormatTypePanelAddTitle.setVisible(true);
+					FormatTypePanelAddTitle.setLocation(279, 108);
+
+					BandPanelAddTitle.setVisible(true);
+					BandPanelAddTitle.setLocation(5, 137);
+
+					OrganiserPanelAddTitle.setVisible(true);
+					OrganiserPanelAddTitle.setLocation(279, 137);
+
+					modelField.setText(null);
+					manufacturerField.setText(null);
+					bandField.setText(null);
+					organiserField.setText(null);
+					genreField.setText(null);
+					directorField.setText(null);
+					FormatTypeCombo.setSelectedIndex(0);
+					// ****************************
+					DirectorPanelAddTitle.setVisible(false);
+					ManufacturerPanelAddTitle.setVisible(false);
+					ModelPanelAddTitle.setVisible(false);
+				} else if (TitleTypeCombo.getSelectedIndex() == 3) {
+					GenrePanelAddTitle.setVisible(true);
+					GenrePanelAddTitle.setLocation(5, 108);
+
+					FormatTypePanelAddTitle.setVisible(true);
+					FormatTypePanelAddTitle.setLocation(279, 108);
+
+					DirectorPanelAddTitle.setVisible(true);
+					DirectorPanelAddTitle.setLocation(145, 137);
+
+					modelField.setText(null);
+					manufacturerField.setText(null);
+					bandField.setText(null);
+					organiserField.setText(null);
+					genreField.setText(null);
+					directorField.setText(null);
+					FormatTypeCombo.setSelectedIndex(0);
+					// **********************************
+					BandPanelAddTitle.setVisible(false);
+					OrganiserPanelAddTitle.setVisible(false);
+					ModelPanelAddTitle.setVisible(false);
+					ManufacturerPanelAddTitle.setVisible(false);
+				} else if (TitleTypeCombo.getSelectedIndex() == 1) {
+					ModelPanelAddTitle.setVisible(true);
+					ModelPanelAddTitle.setLocation(5, 108);
+
+					ManufacturerPanelAddTitle.setVisible(true);
+					ManufacturerPanelAddTitle.setLocation(279, 108);
+
+					modelField.setText(null);
+					manufacturerField.setText(null);
+					bandField.setText(null);
+					organiserField.setText(null);
+					genreField.setText(null);
+					directorField.setText(null);
+					FormatTypeCombo.setSelectedIndex(0);
+					// **********************************
+					GenrePanelAddTitle.setVisible(false);
+					DirectorPanelAddTitle.setVisible(false);
+					OrganiserPanelAddTitle.setVisible(false);
+					BandPanelAddTitle.setVisible(false);
+					FormatTypePanelAddTitle.setVisible(false);
+				} else if (TitleTypeCombo.getSelectedIndex() == 0) {
+					GenrePanelAddTitle.setVisible(false);
+					DirectorPanelAddTitle.setVisible(false);
+					BandPanelAddTitle.setVisible(false);
+					OrganiserPanelAddTitle.setVisible(false);
+					ModelPanelAddTitle.setVisible(false);
+					ManufacturerPanelAddTitle.setVisible(false);
+					FormatTypePanelAddTitle.setVisible(false);
+					modelField.setText(null);
+					manufacturerField.setText(null);
+					bandField.setText(null);
+					organiserField.setText(null);
+					genreField.setText(null);
+					directorField.setText(null);
+					FormatTypeCombo.setSelectedIndex(0);
+				}
+
+			}
+		});
+
+		ModelPanelAddTitle = new JPanel();
+		ModelPanelAddTitle.setVisible(false);
+		ModelPanelAddTitle.setBounds(5, 108, 250, 20);
+		TitleDetailsPanelAddTitle.add(ModelPanelAddTitle);
+		ModelPanelAddTitle.setLayout(null);
+
+		lblModel = new JLabel("Model");
+		lblModel.setBounds(0, 0, 120, 20);
+		ModelPanelAddTitle.add(lblModel);
+		lblModel.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		modelField = new JTextField();
+		modelField.setBounds(120, 0, 130, 20);
+		ModelPanelAddTitle.add(modelField);
+		modelField.setColumns(10);
+
+		ManufacturerPanelAddTitle = new JPanel();
+		ManufacturerPanelAddTitle.setVisible(false);
+		ManufacturerPanelAddTitle.setBounds(279, 108, 250, 20);
+		TitleDetailsPanelAddTitle.add(ManufacturerPanelAddTitle);
+		ManufacturerPanelAddTitle.setLayout(null);
+
+		lblManufacturer = new JLabel("Manufacturer");
+		lblManufacturer.setBounds(0, 0, 120, 20);
+		ManufacturerPanelAddTitle.add(lblManufacturer);
+		lblManufacturer.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		manufacturerField = new JTextField();
+		manufacturerField.setBounds(120, 0, 130, 20);
+		ManufacturerPanelAddTitle.add(manufacturerField);
+		manufacturerField.setColumns(10);
+
+		BandPanelAddTitle = new JPanel();
+		BandPanelAddTitle.setVisible(false);
+		BandPanelAddTitle.setBounds(5, 137, 250, 20);
+		TitleDetailsPanelAddTitle.add(BandPanelAddTitle);
+		BandPanelAddTitle.setLayout(null);
+
+		lblBand = new JLabel("Band");
+		lblBand.setBounds(0, 0, 120, 20);
+		BandPanelAddTitle.add(lblBand);
+		lblBand.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		bandField = new JTextField();
+		bandField.setBounds(120, 0, 130, 20);
+		BandPanelAddTitle.add(bandField);
+		bandField.setColumns(10);
+
+		OrganiserPanelAddTitle = new JPanel();
+		OrganiserPanelAddTitle.setVisible(false);
+		OrganiserPanelAddTitle.setBounds(279, 137, 250, 20);
+		TitleDetailsPanelAddTitle.add(OrganiserPanelAddTitle);
+		OrganiserPanelAddTitle.setLayout(null);
+
+		lblOrganiser = new JLabel("Organiser");
+		lblOrganiser.setBounds(0, 0, 120, 20);
+		OrganiserPanelAddTitle.add(lblOrganiser);
+		lblOrganiser.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		organiserField = new JTextField();
+		organiserField.setBounds(120, 0, 130, 20);
+		OrganiserPanelAddTitle.add(organiserField);
+		organiserField.setColumns(10);
+
+		GenrePanelAddTitle = new JPanel();
+		GenrePanelAddTitle.setVisible(false);
+		GenrePanelAddTitle.setBounds(5, 167, 250, 21);
+		TitleDetailsPanelAddTitle.add(GenrePanelAddTitle);
+		GenrePanelAddTitle.setLayout(null);
+
+		lblGenre = new JLabel("Genre");
+		lblGenre.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblGenre.setBounds(0, 0, 120, 20);
+		GenrePanelAddTitle.add(lblGenre);
+
+		genreField = new JTextField();
+		genreField.setBounds(120, 0, 130, 20);
+		GenrePanelAddTitle.add(genreField);
+		genreField.setColumns(10);
+
+		DirectorPanelAddTitle = new JPanel();
+		DirectorPanelAddTitle.setVisible(false);
+		DirectorPanelAddTitle.setBounds(279, 167, 250, 21);
+		TitleDetailsPanelAddTitle.add(DirectorPanelAddTitle);
+		DirectorPanelAddTitle.setLayout(null);
+
+		lblDirector = new JLabel("Director");
+		lblDirector.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblDirector.setBounds(0, 0, 120, 20);
+		DirectorPanelAddTitle.add(lblDirector);
+
+		directorField = new JTextField();
+		directorField.setBounds(120, 0, 130, 20);
+		DirectorPanelAddTitle.add(directorField);
+		directorField.setColumns(10);
+
+		FormatTypePanelAddTitle = new JPanel();
+		FormatTypePanelAddTitle.setBounds(145, 137, 250, 21);
+		TitleDetailsPanelAddTitle.add(FormatTypePanelAddTitle);
+		FormatTypePanelAddTitle.setVisible(false);
+		FormatTypePanelAddTitle.setLayout(null);
+
+		lblFormatType = new JLabel("Format Type");
+		lblFormatType.setBounds(0, 0, 120, 20);
+		FormatTypePanelAddTitle.add(lblFormatType);
+
+		FormatTypeCombo = new JComboBox<String>(new ComboBoxData().getFormatType());
+		FormatTypeCombo.setBounds(120, 0, 130, 20);
+		FormatTypePanelAddTitle.add(FormatTypeCombo);
+
+		btnGoToHomeAddTitle = new JButton("Go To Home");
+		btnGoToHomeAddTitle.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				switchPanels(Home);
+				titleField.setText(null);
+				dscpText.setText(null);
+				yearField.setText(null);
+				TitleTypeCombo.setSelectedIndex(0);
+				FormatTypeCombo.setSelectedIndex(0);
+				modelField.setText(null);
+				manufacturerField.setText(null);
+				bandField.setText(null);
+				organiserField.setText(null);
+				genreField.setText(null);
+				directorField.setText(null);
+				quantityField.setText(null);
+				searchFieldHome.setText(null);
+			}
+		});
+		btnGoToHomeAddTitle.setBounds(554, 229, 110, 23);
+		AddTitle.add(btnGoToHomeAddTitle);
+
+		btnAddAddTitle = new JButton("Add!");
+		btnAddAddTitle.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (titleField.getText().isEmpty() || dscpText.getText().isEmpty()
+						|| TitleTypeCombo.getSelectedIndex() == 0 || quantityField.getText().isEmpty()
+						|| yearField.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(rootPane, "Fill all the Fields!!!");
+				} else {
+					if (TitleTypeCombo.getSelectedIndex() == 1
+							&& (modelField.getText().isEmpty() || manufacturerField.getText().isEmpty())) {
+						JOptionPane.showMessageDialog(rootPane, "Fill all the Fields!!!");
+					} else if (TitleTypeCombo.getSelectedIndex() == 2
+							&& (bandField.getText().isEmpty() || organiserField.getText().isEmpty()
+									|| FormatTypeCombo.getSelectedIndex() == 0 || genreField.getText().isEmpty())) {
+						JOptionPane.showMessageDialog(rootPane, "Fill all the Fields!!!");
+					} else if ((TitleTypeCombo.getSelectedIndex() == 3 || TitleTypeCombo.getSelectedIndex() == 4)
+							&& (genreField.getText().isEmpty() || FormatTypeCombo.getSelectedIndex() == 0
+									|| directorField.getText().isEmpty())) {
+						JOptionPane.showMessageDialog(rootPane, "Fill all the Fields!!!");
+					} else {
+						if (!inputValidation.validateAlphabets(titleField.getText())
+								|| !inputValidation.validateNumbers(yearField.getText())
+								|| !inputValidation.validateNumbers(quantityField.getText())) {
+							JOptionPane.showMessageDialog(rootPane, "Details are not Valid A");
+						} else {
+							if (TitleTypeCombo.getSelectedIndex() == 1
+									&& (!inputValidation.validateAlphabets(modelField.getText())
+											|| !inputValidation.validateAlphabets(manufacturerField.getText()))) {
+								JOptionPane.showMessageDialog(rootPane, "Details are not Valid B");
+							} else if (TitleTypeCombo.getSelectedIndex() == 2
+									&& (!inputValidation.validateAlphabets(bandField.getText())
+											|| !inputValidation.validateAlphabets(organiserField.getText())
+											|| !inputValidation.validateAlphabets(genreField.getText()))) {
+								JOptionPane.showMessageDialog(rootPane, "Details are not Valid C");
+							} else if ((TitleTypeCombo.getSelectedIndex() == 3
+									|| TitleTypeCombo.getSelectedIndex() == 4)
+									&& (!inputValidation.validateAlphabets(genreField.getText())
+											|| !inputValidation.validateAlphabets(directorField.getText()))) {
+								JOptionPane.showMessageDialog(rootPane, "Details are not Valid D");
+							} else {
+								Product product = new Product(titleField.getText(), dscpText.getText(),
+										TitleTypeCombo.getSelectedItem().toString(),
+										Integer.parseInt(yearField.getText()),
+										Integer.parseInt(quantityField.getText()));
+								if (TitleTypeCombo.getSelectedIndex() == 1) {
+									product.setModel(modelField.getText());
+									product.setManufacturer(manufacturerField.getText());
+									productDao.addProduct(1, product);
+									JOptionPane.showMessageDialog(rootPane, "Success1");
+								} else if (TitleTypeCombo.getSelectedIndex() == 2) {
+									product.setBand(bandField.getText());
+									product.setOrganiser(organiserField.getText());
+									product.setGenre(genreField.getText());
+									product.setFRMT_TYPE(FormatTypeCombo.getSelectedItem().toString());
+									productDao.addProduct(2, product);
+									JOptionPane.showMessageDialog(rootPane, "Success2");
+								} else if ((TitleTypeCombo.getSelectedIndex() == 3
+										|| TitleTypeCombo.getSelectedIndex() == 4)) {
+									product.setGenre(genreField.getText());
+									product.setDirector(directorField.getText());
+									product.setFRMT_TYPE(FormatTypeCombo.getSelectedItem().toString());
+									productDao.addProduct(3, product);
+									JOptionPane.showMessageDialog(rootPane, "Success3");
+								}
+								titleField.setText(null);
+								dscpText.setText(null);
+								yearField.setText(null);
+								TitleTypeCombo.setSelectedIndex(0);
+								FormatTypeCombo.setSelectedIndex(0);
+								modelField.setText(null);
+								manufacturerField.setText(null);
+								bandField.setText(null);
+								organiserField.setText(null);
+								genreField.setText(null);
+								directorField.setText(null);
+								quantityField.setText(null);
+							}
+
+						}
+					}
+				}
+			}
+		});
+		btnAddAddTitle.setBounds(554, 263, 110, 23);
+		AddTitle.add(btnAddAddTitle);
+
+		btnResetFieldsAddTitle = new JButton("Reset Fields");
+		btnResetFieldsAddTitle.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				titleField.setText(null);
+				dscpText.setText(null);
+				yearField.setText(null);
+				TitleTypeCombo.setSelectedIndex(0);
+				FormatTypeCombo.setSelectedIndex(0);
+				modelField.setText(null);
+				manufacturerField.setText(null);
+				bandField.setText(null);
+				organiserField.setText(null);
+				genreField.setText(null);
+				directorField.setText(null);
+				quantityField.setText(null);
+			}
+		});
+		btnResetFieldsAddTitle.setBounds(554, 195, 110, 23);
+		AddTitle.add(btnResetFieldsAddTitle);
+
+		lblTitleDetails = new JLabel("Title Details");
+		lblTitleDetails.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTitleDetails.setFont(new Font("Times New Roman", Font.PLAIN, 18));
+		lblTitleDetails.setBounds(227, 111, 100, 22);
+		AddTitle.add(lblTitleDetails);
+	}
+
 	public App(Staff staff) {
 
 		setResizable(false);
@@ -821,8 +1363,9 @@ public class App extends JFrame {
 		SearchCustomerGUI();
 		ProfileGUI();
 		EditCustomerGUI();
+		SearchTitleGUI();
+		AddTitleGUI();
 		
-
 		setVisible(true);
 	}
 }
