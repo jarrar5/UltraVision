@@ -2,6 +2,8 @@ package Interfaces;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
@@ -9,6 +11,7 @@ import javax.swing.table.TableModel;
 import javax.swing.text.DefaultEditorKit.CutAction;
 
 import DataAccess.CustomerDao;
+import DataAccess.ProductDao;
 import Helpers.InputValidation;
 import Models.Customer;
 import Models.Staff;
@@ -23,6 +26,8 @@ import javax.swing.JComboBox;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -48,6 +53,32 @@ public class App extends JFrame {
 	private JTextField nameFieldRegCust, emailFieldRegCust, phoneFieldRegCust, cardNumberFieldRegCust;
 	private JComboBox accesslvlComboRegCust, subscriptionComboRegCust;
 
+	// Search Customer Panel
+	private JPanel SearchCustomer, CustTablePanelSrchCust, LogoPanelSrchCust;
+	private JLabel lblSearchResultsSrchCust, lblLogoNameSrchCust, lblLogoCityNameSrchCust, lblSelectedCustomerSrchCust,
+			lblSelectedCustNameSrchCust;
+	private JButton btnGoToHomeSrchCust, btnEditProfileSrchCust, btnViewProfileSrchCust;
+	private JTable CustTableSrchCust;
+	private JScrollPane CustScrollPaneSrchCust;
+
+	// Edit Customer
+	private JPanel EditCustomer, LogoPanelEditCust, CustomerDetailsPanelEditCust;
+	private JLabel lblEditCustomer, lblNameEditCust, lblEmailEditCust, lblPhoneEditCust, lblDebitcreditCardEditCust,
+			lblAccessLevelEditCust, lblSubscriptionEditCust, lblLogoNameEditCust, lblLogoCityNameEditCust,
+			lblCustomerDetailsEditCust;
+	private JTextField nameFieldEditCust, emailFieldEditCust, phoneFieldEditCust, cardNumberFieldEditCust;
+	private JComboBox accesslvlComboEditCust, subscriptionComboEditCust;
+	private JButton btnUpdateEditCust, btnGoToHomeEditCust;
+
+	// Profile
+	private JPanel Profile, LogoPanelProfile, CustDetailsPanelProfile;
+	private JLabel lblProfile, lblNameProfile, lblEmailProfile, lblPhoneProfile, lblDebitcreditCardProfile,
+			lblLoyaltyPointsProfile, lblAccessLevelProfile, lblSubscriptionTypeProfile, lblNameCustProfile,
+			lblEmailCustProfile, lblDebitcreditCardCustProfile, lblPhoneCustProfile, lblSubscriptionTypeCustProfile,
+			lblAccessLevelCustProfile, lblLoyaltyPointsCustProfile, lblIdProfile, lblidCustProfile, lblLogoNameProfile,
+			lblLogoCityNameProfile, lblCustomerDetailsProfile;
+	private JButton btnIssueNewRentalProfile, btnViewIssuedRentalsProfile, btnGoToHomeProfile, btnRedeemLoyaltyPoints;
+
 	// Initializations
 	String[] accesslvl = { "--Select Access Level Type--", "Music Lovers", "Premium", "TV Lover", "Video Lovers" };
 	String[] subscription = { "--Select Subscription Type--", "Basic", "Delux", "Premium", "Standard" };
@@ -56,8 +87,13 @@ public class App extends JFrame {
 	private Staff ActiveStaff;
 	private Customer customer;
 
+	int index = -1;
+	private TableModel model;
+
+	boolean redeemFlag = false;
+
 	private CustomerDao customerDao = new CustomerDao();
-	
+
 	private InputValidation inputValidation;
 
 	public void switchPanels(JPanel panel) {
@@ -329,6 +365,451 @@ public class App extends JFrame {
 
 	}
 
+	public void SearchCustomerGUI() {
+		SearchCustomer = new JPanel();
+		layeredPane.add(SearchCustomer, "name_2324474656071100");
+		SearchCustomer.setLayout(null);
+
+		lblSearchResultsSrchCust = new JLabel("Search Results");
+		lblSearchResultsSrchCust.setFont(new Font("Tahoma", Font.BOLD, 26));
+		lblSearchResultsSrchCust.setBounds(10, 11, 220, 40);
+		SearchCustomer.add(lblSearchResultsSrchCust);
+
+		CustTablePanelSrchCust = new JPanel();
+		CustTablePanelSrchCust.setBounds(10, 130, 534, 208);
+		SearchCustomer.add(CustTablePanelSrchCust);
+		CustTablePanelSrchCust.setLayout(null);
+
+		CustScrollPaneSrchCust = new JScrollPane();
+		CustScrollPaneSrchCust.setBounds(0, 0, 534, 208);
+		CustTablePanelSrchCust.add(CustScrollPaneSrchCust);
+
+		CustTableSrchCust = new JTable();
+		CustScrollPaneSrchCust.setViewportView(CustTableSrchCust);
+		CustTableSrchCust.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				index = CustTableSrchCust.getSelectedRow();
+				model = CustTableSrchCust.getModel();
+				btnEditProfileSrchCust.setVisible(true);
+				btnViewProfileSrchCust.setVisible(true);
+				lblSelectedCustomerSrchCust.setVisible(true);
+				lblSelectedCustNameSrchCust.setVisible(true);
+				lblSelectedCustNameSrchCust.setText(model.getValueAt(index, 1).toString());
+
+				System.out.println(model.getValueAt(index, 0).toString());
+
+				customer.setID(Integer.parseInt(model.getValueAt(index, 0).toString()));
+				customer.setNME(model.getValueAt(index, 1).toString());
+				customer.setEMAIL(model.getValueAt(index, 2).toString());
+				customer.setPHNE(Long.parseLong(model.getValueAt(index, 3).toString()));
+				customer.setACC_CRD(Long.parseLong(model.getValueAt(index, 4).toString()));
+				customer.setLYLTY_PNTS(Integer.parseInt(model.getValueAt(index, 5).toString()));
+				customer.setACCS_LVL(model.getValueAt(index, 6).toString());
+				customer.setSBSC(model.getValueAt(index, 7).toString());
+
+			}
+		});
+
+		btnGoToHomeSrchCust = new JButton("Go to Home");
+		btnGoToHomeSrchCust.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				switchPanels(Home);
+			}
+		});
+		btnGoToHomeSrchCust.setBounds(554, 191, 110, 23);
+		SearchCustomer.add(btnGoToHomeSrchCust);
+
+		btnEditProfileSrchCust = new JButton("Edit Profile");
+		btnEditProfileSrchCust.setVisible(false);
+		btnEditProfileSrchCust.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (index != -1) {
+
+					nameFieldEditCust.setText(customer.getNME());
+					emailFieldEditCust.setText(customer.getEMAIL());
+					phoneFieldEditCust.setText(String.valueOf(customer.getPHNE()));
+					cardNumberFieldEditCust.setText(String.valueOf(customer.getACC_CRD()));
+					accesslvlComboEditCust.setSelectedItem(customer.getACCS_LVL());
+					subscriptionComboEditCust.setSelectedItem(customer.getSBSC());
+
+					switchPanels(EditCustomer);
+
+					btnEditProfileSrchCust.setText("Edit Customer");
+					btnEditProfileSrchCust.setVisible(false);
+					btnViewProfileSrchCust.setVisible(false);
+				} else {
+					JOptionPane.showMessageDialog(rootPane, "Click on a row to Select");
+				}
+			}
+		});
+		btnEditProfileSrchCust.setBounds(554, 225, 110, 23);
+		SearchCustomer.add(btnEditProfileSrchCust);
+
+		btnViewProfileSrchCust = new JButton("View Profile");
+		btnViewProfileSrchCust.setVisible(false);
+		btnViewProfileSrchCust.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (customer.getLYLTY_PNTS() >= 100) {
+					btnRedeemLoyaltyPoints.setVisible(true);
+				} else {
+					btnRedeemLoyaltyPoints.setVisible(false);
+				}
+				lblidCustProfile.setText(String.valueOf(customer.getID()));
+				lblNameCustProfile.setText(customer.getNME());
+				lblEmailCustProfile.setText(customer.getEMAIL());
+				lblPhoneCustProfile.setText(String.valueOf(customer.getPHNE()));
+				lblDebitcreditCardCustProfile.setText(String.valueOf(customer.getACC_CRD()));
+				lblLoyaltyPointsCustProfile.setText(String.valueOf(customer.getLYLTY_PNTS()));
+				lblAccessLevelCustProfile.setText(customer.getACCS_LVL());
+				lblSubscriptionTypeCustProfile.setText(customer.getSBSC());
+				switchPanels(Profile);
+			}
+		});
+		btnViewProfileSrchCust.setBounds(554, 259, 110, 23);
+		SearchCustomer.add(btnViewProfileSrchCust);
+
+		LogoPanelSrchCust = new JPanel();
+		LogoPanelSrchCust.setLayout(null);
+		LogoPanelSrchCust.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "",
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		LogoPanelSrchCust.setBounds(432, 11, 232, 95);
+		SearchCustomer.add(LogoPanelSrchCust);
+
+		lblLogoNameSrchCust = new JLabel("Ultra-Vision");
+		lblLogoNameSrchCust.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogoNameSrchCust.setFont(new Font("Segoe Script", Font.BOLD, 30));
+		lblLogoNameSrchCust.setBounds(6, 16, 220, 49);
+		LogoPanelSrchCust.add(lblLogoNameSrchCust);
+
+		lblLogoCityNameSrchCust = new JLabel("Dublin.");
+		lblLogoCityNameSrchCust.setFont(new Font("Segoe Print", Font.PLAIN, 14));
+		lblLogoCityNameSrchCust.setBounds(177, 62, 49, 26);
+		LogoPanelSrchCust.add(lblLogoCityNameSrchCust);
+
+		lblSelectedCustomerSrchCust = new JLabel("Selected Customer");
+		lblSelectedCustomerSrchCust.setVisible(false);
+		lblSelectedCustomerSrchCust.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblSelectedCustomerSrchCust.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblSelectedCustomerSrchCust.setBounds(36, 92, 115, 14);
+		SearchCustomer.add(lblSelectedCustomerSrchCust);
+
+		lblSelectedCustNameSrchCust = new JLabel("");
+		lblSelectedCustNameSrchCust.setVisible(false);
+		lblSelectedCustNameSrchCust.setVerticalAlignment(SwingConstants.BOTTOM);
+		lblSelectedCustNameSrchCust.setFont(new Font("Times New Roman", Font.BOLD, 24));
+		lblSelectedCustNameSrchCust.setBounds(161, 79, 130, 31);
+		SearchCustomer.add(lblSelectedCustNameSrchCust);
+	}
+
+	private void ProfileGUI() {
+		Profile = new JPanel();
+		layeredPane.add(Profile, "name_2701493917085700");
+		Profile.setLayout(null);
+
+		lblProfile = new JLabel("Profile");
+		lblProfile.setFont(new Font("Tahoma", Font.BOLD, 26));
+		lblProfile.setBounds(10, 11, 100, 40);
+		Profile.add(lblProfile);
+
+		LogoPanelProfile = new JPanel();
+		LogoPanelProfile.setLayout(null);
+		LogoPanelProfile.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "",
+
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		LogoPanelProfile.setBounds(432, 11, 232, 95);
+		Profile.add(LogoPanelProfile);
+
+		lblLogoNameProfile = new JLabel("Ultra-Vision");
+		lblLogoNameProfile.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogoNameProfile.setFont(new Font("Segoe Script", Font.BOLD, 30));
+		lblLogoNameProfile.setBounds(6, 16, 220, 49);
+		LogoPanelProfile.add(lblLogoNameProfile);
+
+		lblLogoCityNameProfile = new JLabel("Dublin.");
+		lblLogoCityNameProfile.setFont(new Font("Segoe Print", Font.PLAIN, 14));
+		lblLogoCityNameProfile.setBounds(177, 62, 49, 26);
+		LogoPanelProfile.add(lblLogoCityNameProfile);
+
+		lblCustomerDetailsProfile = new JLabel("Customer Details");
+		lblCustomerDetailsProfile.setFont(new Font("Times New Roman", Font.PLAIN, 22));
+		lblCustomerDetailsProfile.setBounds(20, 86, 154, 27);
+		Profile.add(lblCustomerDetailsProfile);
+
+		btnRedeemLoyaltyPoints = new JButton("Redeem Loyalty Points");
+
+		btnRedeemLoyaltyPoints.setVisible(false);
+
+		btnRedeemLoyaltyPoints.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
+		btnRedeemLoyaltyPoints.setBounds(257, 90, 165, 23);
+		Profile.add(btnRedeemLoyaltyPoints);
+
+		CustDetailsPanelProfile = new JPanel();
+		CustDetailsPanelProfile.setBounds(10, 124, 504, 214);
+		Profile.add(CustDetailsPanelProfile);
+		CustDetailsPanelProfile.setLayout(null);
+
+		lblNameProfile = new JLabel("Name");
+		lblNameProfile.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblNameProfile.setBounds(34, 11, 120, 25);
+		CustDetailsPanelProfile.add(lblNameProfile);
+
+		lblEmailProfile = new JLabel("Email");
+		lblEmailProfile.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblEmailProfile.setBounds(34, 46, 120, 25);
+		CustDetailsPanelProfile.add(lblEmailProfile);
+
+		lblPhoneProfile = new JLabel("Phone");
+		lblPhoneProfile.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblPhoneProfile.setBounds(34, 81, 120, 25);
+		CustDetailsPanelProfile.add(lblPhoneProfile);
+
+		lblDebitcreditCardProfile = new JLabel("Debit/Credit Card #");
+		lblDebitcreditCardProfile.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblDebitcreditCardProfile.setBounds(34, 116, 120, 25);
+		CustDetailsPanelProfile.add(lblDebitcreditCardProfile);
+
+		lblAccessLevelProfile = new JLabel("Access Level");
+		lblAccessLevelProfile.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblAccessLevelProfile.setBounds(34, 151, 120, 25);
+		CustDetailsPanelProfile.add(lblAccessLevelProfile);
+
+		lblSubscriptionTypeProfile = new JLabel("Subscription Type");
+		lblSubscriptionTypeProfile.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblSubscriptionTypeProfile.setBounds(34, 186, 120, 25);
+		CustDetailsPanelProfile.add(lblSubscriptionTypeProfile);
+
+		lblNameCustProfile = new JLabel("");
+		lblNameCustProfile.setBounds(154, 11, 199, 25);
+		CustDetailsPanelProfile.add(lblNameCustProfile);
+		lblNameCustProfile.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		lblEmailCustProfile = new JLabel("");
+		lblEmailCustProfile.setBounds(154, 46, 199, 25);
+		CustDetailsPanelProfile.add(lblEmailCustProfile);
+		lblEmailCustProfile.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		lblPhoneCustProfile = new JLabel("");
+		lblPhoneCustProfile.setBounds(154, 81, 199, 25);
+		CustDetailsPanelProfile.add(lblPhoneCustProfile);
+		lblPhoneCustProfile.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		lblDebitcreditCardCustProfile = new JLabel("");
+		lblDebitcreditCardCustProfile.setBounds(154, 116, 199, 25);
+		CustDetailsPanelProfile.add(lblDebitcreditCardCustProfile);
+		lblDebitcreditCardCustProfile.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		lblSubscriptionTypeCustProfile = new JLabel("");
+		lblSubscriptionTypeCustProfile.setBounds(154, 186, 199, 25);
+		CustDetailsPanelProfile.add(lblSubscriptionTypeCustProfile);
+		lblSubscriptionTypeCustProfile.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		lblLoyaltyPointsProfile = new JLabel("Loyalty Points:");
+		lblLoyaltyPointsProfile.setBounds(398, 116, 85, 14);
+		CustDetailsPanelProfile.add(lblLoyaltyPointsProfile);
+		lblLoyaltyPointsProfile.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		lblLoyaltyPointsCustProfile = new JLabel("000");
+		lblLoyaltyPointsCustProfile.setBounds(398, 131, 85, 24);
+		CustDetailsPanelProfile.add(lblLoyaltyPointsCustProfile);
+		lblLoyaltyPointsCustProfile.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLoyaltyPointsCustProfile.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		lblIdProfile = new JLabel("ID");
+		lblIdProfile.setBounds(436, 63, 15, 15);
+		CustDetailsPanelProfile.add(lblIdProfile);
+		lblIdProfile.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+
+		lblidCustProfile = new JLabel("0");
+		lblidCustProfile.setBounds(410, 78, 65, 24);
+		CustDetailsPanelProfile.add(lblidCustProfile);
+		lblidCustProfile.setHorizontalAlignment(SwingConstants.CENTER);
+		lblidCustProfile.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		lblAccessLevelCustProfile = new JLabel("");
+		lblAccessLevelCustProfile.setBounds(154, 151, 199, 25);
+		CustDetailsPanelProfile.add(lblAccessLevelCustProfile);
+		lblAccessLevelCustProfile.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		btnIssueNewRentalProfile = new JButton("Issue New Rental");
+		btnIssueNewRentalProfile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
+
+		btnGoToHomeProfile = new JButton("Go to Home");
+		btnGoToHomeProfile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				switchPanels(Home);
+			}
+		});
+		btnGoToHomeProfile.setBounds(524, 188, 140, 25);
+		Profile.add(btnGoToHomeProfile);
+		btnIssueNewRentalProfile.setBounds(524, 223, 140, 25);
+		Profile.add(btnIssueNewRentalProfile);
+
+		btnViewIssuedRentalsProfile = new JButton("View Issued \r\nRentals");
+		btnViewIssuedRentalsProfile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		btnViewIssuedRentalsProfile.setBounds(524, 258, 140, 25);
+		Profile.add(btnViewIssuedRentalsProfile);
+	}
+
+	public void EditCustomerGUI() {
+		EditCustomer = new JPanel();
+		layeredPane.add(EditCustomer, "name_2671265022984500");
+		EditCustomer.setLayout(null);
+
+		lblEditCustomer = new JLabel("Edit Customer");
+		lblEditCustomer.setFont(new Font("Tahoma", Font.BOLD, 26));
+		lblEditCustomer.setBounds(10, 11, 195, 32);
+		EditCustomer.add(lblEditCustomer);
+
+		lblCustomerDetailsEditCust = new JLabel("Customer Details");
+		lblCustomerDetailsEditCust.setFont(new Font("Times New Roman", Font.PLAIN, 18));
+		lblCustomerDetailsEditCust.setBounds(204, 119, 135, 22);
+		EditCustomer.add(lblCustomerDetailsEditCust);
+
+		CustomerDetailsPanelEditCust = new JPanel();
+		CustomerDetailsPanelEditCust.setBounds(10, 144, 534, 194);
+		EditCustomer.add(CustomerDetailsPanelEditCust);
+		CustomerDetailsPanelEditCust.setLayout(null);
+
+		lblNameEditCust = new JLabel("Name");
+		lblNameEditCust.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblNameEditCust.setBounds(101, 11, 120, 20);
+		CustomerDetailsPanelEditCust.add(lblNameEditCust);
+
+		lblEmailEditCust = new JLabel("Email");
+		lblEmailEditCust.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblEmailEditCust.setBounds(101, 42, 120, 20);
+		CustomerDetailsPanelEditCust.add(lblEmailEditCust);
+
+		lblPhoneEditCust = new JLabel("Phone");
+		lblPhoneEditCust.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblPhoneEditCust.setBounds(101, 73, 120, 20);
+		CustomerDetailsPanelEditCust.add(lblPhoneEditCust);
+
+		lblDebitcreditCardEditCust = new JLabel("Debit/Credit Card #");
+		lblDebitcreditCardEditCust.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblDebitcreditCardEditCust.setBounds(101, 104, 120, 20);
+		CustomerDetailsPanelEditCust.add(lblDebitcreditCardEditCust);
+
+		lblAccessLevelEditCust = new JLabel("Access Level");
+		lblAccessLevelEditCust.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblAccessLevelEditCust.setBounds(101, 135, 120, 20);
+		CustomerDetailsPanelEditCust.add(lblAccessLevelEditCust);
+
+		lblSubscriptionEditCust = new JLabel("Subscription Type");
+		lblSubscriptionEditCust.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblSubscriptionEditCust.setBounds(101, 166, 120, 20);
+		CustomerDetailsPanelEditCust.add(lblSubscriptionEditCust);
+
+		nameFieldEditCust = new JTextField();
+		nameFieldEditCust.setBounds(231, 12, 200, 20);
+		CustomerDetailsPanelEditCust.add(nameFieldEditCust);
+		nameFieldEditCust.setColumns(10);
+
+		emailFieldEditCust = new JTextField();
+		emailFieldEditCust.setBounds(231, 43, 200, 20);
+		CustomerDetailsPanelEditCust.add(emailFieldEditCust);
+		emailFieldEditCust.setColumns(10);
+
+		phoneFieldEditCust = new JTextField();
+		phoneFieldEditCust.setBounds(231, 74, 200, 20);
+		CustomerDetailsPanelEditCust.add(phoneFieldEditCust);
+		phoneFieldEditCust.setColumns(10);
+
+		cardNumberFieldEditCust = new JTextField();
+		cardNumberFieldEditCust.setBounds(231, 105, 200, 20);
+		CustomerDetailsPanelEditCust.add(cardNumberFieldEditCust);
+		cardNumberFieldEditCust.setColumns(10);
+
+		accesslvlComboEditCust = new JComboBox(accesslvl);
+		accesslvlComboEditCust.setBounds(231, 136, 200, 20);
+		CustomerDetailsPanelEditCust.add(accesslvlComboEditCust);
+
+		subscriptionComboEditCust = new JComboBox(subscription);
+		subscriptionComboEditCust.setBounds(231, 167, 200, 20);
+		CustomerDetailsPanelEditCust.add(subscriptionComboEditCust);
+
+		btnUpdateEditCust = new JButton("Update");
+		btnUpdateEditCust.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(index);
+				System.out.println(model.getValueAt(index, 5).toString());
+				customer = new Customer(Integer.parseInt(model.getValueAt(index, 5).toString()));
+				if (nameFieldEditCust.getText().isEmpty() || emailFieldEditCust.getText().isEmpty()
+						|| phoneFieldEditCust.getText().isEmpty() || cardNumberFieldEditCust.getText().isEmpty()
+						|| accesslvlComboEditCust.getSelectedIndex() == 0
+						|| subscriptionComboEditCust.getSelectedIndex() == 0) {
+					JOptionPane.showMessageDialog(rootPane, "Fill all the Fields!!!");
+				} else if (!inputValidation.validateAlphabets(nameFieldEditCust.getText())
+						|| !inputValidation.validateEmail(emailFieldEditCust.getText())
+						|| !inputValidation.validateNumbers(phoneFieldEditCust.getText())
+						|| !inputValidation.validateNumbers(cardNumberFieldEditCust.getText())) {
+					JOptionPane.showMessageDialog(rootPane, "Details are not Valid!!!");
+				} else {
+					if (phoneFieldEditCust.getText().length() > 13) {
+						JOptionPane.showMessageDialog(rootPane, "Phone Number limit exceeds 13 digits", "Error", 1);
+					} else if (cardNumberFieldEditCust.getText().length() > 16) {
+						JOptionPane.showMessageDialog(rootPane, "Card Number limit exceeds 16 digits", "Error", 1);
+					} else {
+						customer.setNME(nameFieldEditCust.getText());
+						customer.setEMAIL(emailFieldEditCust.getText());
+						customer.setPHNE(Long.parseLong(phoneFieldEditCust.getText()));
+						customer.setACC_CRD(Long.parseLong(cardNumberFieldEditCust.getText()));
+						customer.setACCS_LVL(accesslvlComboEditCust.getSelectedItem().toString());
+						customer.setSBSC(subscriptionComboEditCust.getSelectedItem().toString());
+
+						customerDao.updateCustomer(Integer.parseInt(model.getValueAt(index, 0).toString()), customer);
+						customer = new Customer();
+						JOptionPane.showMessageDialog(rootPane, "Success");
+						switchPanels(Home);
+					}
+				}
+			}
+		});
+		btnUpdateEditCust.setBounds(554, 239, 110, 23);
+		EditCustomer.add(btnUpdateEditCust);
+
+		btnGoToHomeEditCust = new JButton("Go to Home");
+		btnGoToHomeEditCust.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				index = -1;
+				switchPanels(Home);
+				customer = new Customer();
+			}
+		});
+		btnGoToHomeEditCust.setBounds(554, 205, 110, 23);
+		EditCustomer.add(btnGoToHomeEditCust);
+
+		LogoPanelEditCust = new JPanel();
+		LogoPanelEditCust.setLayout(null);
+		LogoPanelEditCust.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "",
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		LogoPanelEditCust.setBounds(432, 11, 232, 95);
+		EditCustomer.add(LogoPanelEditCust);
+
+		lblLogoNameEditCust = new JLabel("Ultra-Vision");
+		lblLogoNameEditCust.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogoNameEditCust.setFont(new Font("Segoe Script", Font.BOLD, 30));
+		lblLogoNameEditCust.setBounds(6, 16, 220, 49);
+		LogoPanelEditCust.add(lblLogoNameEditCust);
+
+		lblLogoCityNameEditCust = new JLabel("Dublin.");
+		lblLogoCityNameEditCust.setFont(new Font("Segoe Print", Font.PLAIN, 14));
+		lblLogoCityNameEditCust.setBounds(177, 62, 49, 26);
+		LogoPanelEditCust.add(lblLogoCityNameEditCust);
+	}
+
 	public App(Staff staff) {
 
 		setResizable(false);
@@ -336,6 +817,11 @@ public class App extends JFrame {
 		InstanciateApp(staff);
 
 		HomeGUI();
+		RegisterCustomerGUI();
+		SearchCustomerGUI();
+		ProfileGUI();
+		EditCustomerGUI();
+		
 
 		setVisible(true);
 	}

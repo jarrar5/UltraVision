@@ -31,4 +31,19 @@ public class CustomerDao {
 		}
 	}
 
+	public boolean updateCustomer(int id, Customer customer) {
+		try {
+			
+			String query = "UPDATE Customer SET NME ='"+customer.getNME()+"',EMAIL ='"+customer.getEMAIL()+"',PHNE ="+customer.getPHNE()+" ,ACC_CARD ="+customer.getACC_CRD()+" ,ACCS_LVL ='"+customer.getACCS_LVL()+"' ,SBSC ='"+customer.getSBSC()+"' WHERE ID ="+id;
+			System.out.println(query);
+			PreparedStatement pstmt = con.prepareStatement(query);
+			pstmt.execute();
+
+			return true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+	
 }
