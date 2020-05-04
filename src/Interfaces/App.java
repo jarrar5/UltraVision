@@ -41,6 +41,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.awt.Color;
 import java.awt.Component;
 
@@ -122,6 +124,15 @@ public class App extends JFrame {
 	private JTextField searchTitleFieldIssueRental;
 	private JButton btnSearchTitleIssueRental, btnIssueIssueRental, btnGoBackProfileIssueRental;
 
+	// Issued Rentals
+	private JPanel IssuedRentals, RentalsTablePanelIssuedRentals, LogoPanelIssuedRentals;
+	private JLabel lblIssuedRentals, lblCustomerIssuedRentals, lblCustomerNameIssuedRentals,
+			lblSelectedRentalIssuedRentals, lblSelectedRentalNameIssuedRentals;
+	private JButton btnGoBackIssuedRentals, btnReturnRentalIssuedRentals;
+	private JScrollPane RentalsScrollPaneIssuedRentals;
+	private JTable RentalsTableIssuedRentals;
+	private JLabel lblLogoNameIssuedRentals, lblLogoCityNameIssuedRentals;
+
 	// Initializations
 	String[] accesslvl = { "--Select Access Level Type--", "Music Lovers", "Premium", "TV Lover", "Video Lovers" };
 	String[] subscription = { "--Select Subscription Type--", "Basic", "Delux", "Premium", "Standard" };
@@ -140,12 +151,14 @@ public class App extends JFrame {
 	private TransactionDao transactionDao = new TransactionDao();
 
 	private Adapter adapter = new Adapter();
-	
+
 	private JPanel warningPanelIssueRental;
 	private JLabel lblCantIssue;
 	private JLabel lblLimitReached;
-	
+
 	private InputValidation inputValidation;
+	
+	SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 	public void switchPanels(JPanel panel) {
 		layeredPane.removeAll();
@@ -155,20 +168,20 @@ public class App extends JFrame {
 	}
 
 	public void resizeColumnWidth(JTable table) {
-	    final TableColumnModel columnModel = table.getColumnModel();
-	    for (int column = 0; column < table.getColumnCount(); column++) {
-	        int width = 15; // Min width
-	        for (int row = 0; row < table.getRowCount(); row++) {
-	            TableCellRenderer renderer = table.getCellRenderer(row, column);
-	            Component comp = table.prepareRenderer(renderer, row, column);
-	            width = Math.max(comp.getPreferredSize().width +1 , width);
-	        }
-	        if(width > 300)
-	            width=300;
-	        columnModel.getColumn(column).setPreferredWidth(width);
-	    }
+		final TableColumnModel columnModel = table.getColumnModel();
+		for (int column = 0; column < table.getColumnCount(); column++) {
+			int width = 15; // Min width
+			for (int row = 0; row < table.getRowCount(); row++) {
+				TableCellRenderer renderer = table.getCellRenderer(row, column);
+				Component comp = table.prepareRenderer(renderer, row, column);
+				width = Math.max(comp.getPreferredSize().width + 1, width);
+			}
+			if (width > 300)
+				width = 300;
+			columnModel.getColumn(column).setPreferredWidth(width);
+		}
 	}
-	
+
 	public void InstanciateApp(Staff staff) {
 		ActiveStaff = staff;
 		inputValidation = new InputValidation();
@@ -757,7 +770,11 @@ public class App extends JFrame {
 		btnViewIssuedRentalsProfile = new JButton("View Issued \r\nRentals");
 		btnViewIssuedRentalsProfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				lblCustomerNameIssuedRentals.setText(lblNameCustProfile.getText());
+				RentalsTableIssuedRentals.setModel(DbUtils.resultSetToTableModel(
+						transactionDao.getTransactions(Integer.parseInt(lblidCustProfile.getText()))));
+				switchPanels(IssuedRentals);
+				resizeColumnWidth(RentalsTableIssuedRentals);
 			}
 		});
 		btnViewIssuedRentalsProfile.setBounds(524, 258, 140, 25);
@@ -1702,6 +1719,133 @@ public class App extends JFrame {
 		lblLimitReached.setFont(new Font("Tahoma", Font.BOLD, 14));
 	}
 
+	private void IssuedRentalsGUI() {
+		IssuedRentals = new JPanel();
+		layeredPane.add(IssuedRentals, "name_2796370915378100");
+		IssuedRentals.setLayout(null);
+
+		lblIssuedRentals = new JLabel("Issued Rentals");
+		lblIssuedRentals.setFont(new Font("Tahoma", Font.BOLD, 26));
+		lblIssuedRentals.setBounds(10, 11, 205, 32);
+		IssuedRentals.add(lblIssuedRentals);
+
+		btnGoBackIssuedRentals = new JButton("Go Back");
+		btnGoBackIssuedRentals.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (customer.getLYLTY_PNTS() >= 100) {
+					btnRedeemLoyaltyPoints.setVisible(true);
+				} else {
+					btnRedeemLoyaltyPoints.setVisible(false);
+				}
+				index = -1;
+				lblSelectedRentalIssuedRentals.setVisible(false);
+				lblSelectedRentalNameIssuedRentals.setVisible(false);
+				switchPanels(Profile);
+			}
+		});
+
+		lblCustomerIssuedRentals = new JLabel("Customer Name");
+		lblCustomerIssuedRentals.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCustomerIssuedRentals.setBounds(38, 97, 130, 14);
+		IssuedRentals.add(lblCustomerIssuedRentals);
+
+		lblCustomerNameIssuedRentals = new JLabel("");
+		lblCustomerNameIssuedRentals.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCustomerNameIssuedRentals.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		lblCustomerNameIssuedRentals.setBounds(38, 112, 130, 30);
+		IssuedRentals.add(lblCustomerNameIssuedRentals);
+
+		lblSelectedRentalIssuedRentals = new JLabel("Selected");
+		lblSelectedRentalIssuedRentals.setVisible(false);
+		lblSelectedRentalIssuedRentals.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSelectedRentalIssuedRentals.setBounds(280, 97, 130, 15);
+		IssuedRentals.add(lblSelectedRentalIssuedRentals);
+
+		lblSelectedRentalNameIssuedRentals = new JLabel("");
+		lblSelectedRentalNameIssuedRentals.setVisible(false);
+		lblSelectedRentalNameIssuedRentals.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSelectedRentalNameIssuedRentals.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		lblSelectedRentalNameIssuedRentals.setBounds(280, 112, 130, 30);
+		IssuedRentals.add(lblSelectedRentalNameIssuedRentals);
+
+		RentalsTablePanelIssuedRentals = new JPanel();
+		RentalsTablePanelIssuedRentals.setBounds(10, 153, 534, 185);
+		IssuedRentals.add(RentalsTablePanelIssuedRentals);
+		RentalsTablePanelIssuedRentals.setLayout(null);
+
+		RentalsScrollPaneIssuedRentals = new JScrollPane();
+		RentalsScrollPaneIssuedRentals.setBounds(0, 0, 534, 185);
+		RentalsTablePanelIssuedRentals.add(RentalsScrollPaneIssuedRentals);
+
+		RentalsTableIssuedRentals = new JTable();
+		RentalsScrollPaneIssuedRentals.setViewportView(RentalsTableIssuedRentals);
+		RentalsTableIssuedRentals.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				index = RentalsTableIssuedRentals.getSelectedRow();
+				model = RentalsTableIssuedRentals.getModel();
+				lblSelectedRentalIssuedRentals.setVisible(true);
+				lblSelectedRentalNameIssuedRentals.setVisible(true);
+				lblSelectedRentalNameIssuedRentals.setText(model.getValueAt(index, 0).toString());
+			}
+		});
+		btnGoBackIssuedRentals.setBounds(554, 210, 110, 23);
+		IssuedRentals.add(btnGoBackIssuedRentals);
+
+		btnReturnRentalIssuedRentals = new JButton("Return ");
+		btnReturnRentalIssuedRentals.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Return");
+				System.out.println(index);
+				System.out.println(index != -1);
+				if (index != -1) {
+					System.out.println("A");
+					String status = model.getValueAt(index, 4).toString();
+					System.out.println(status);
+					switch (status) {
+					case ("Issued"):
+						System.out.println("ID= " + model.getValueAt(index, 0).toString());
+						System.out.println("ProdID= " + model.getValueAt(index, 2).toString());
+						transactionDao.markReturn(Integer.parseInt(model.getValueAt(index, 0).toString()),
+								formatter.format(new Date()));
+						productDao.increment(Integer.parseInt(model.getValueAt(index, 2).toString()));
+						JOptionPane.showMessageDialog(rootPane, "Success!!!");
+						RentalsTableIssuedRentals.setModel(DbUtils.resultSetToTableModel(
+								transactionDao.getTransactions(Integer.parseInt(lblidCustProfile.getText()))));
+						resizeColumnWidth(RentalsTableIssuedRentals);
+						break;
+					case ("Returned"):
+						JOptionPane.showMessageDialog(rootPane, "Item already Returned");
+						break;
+					}
+				} else {
+					JOptionPane.showMessageDialog(rootPane, "No Selection Made!!!");
+				}
+				System.out.println("Return 2");
+			}
+		});
+		btnReturnRentalIssuedRentals.setBounds(554, 244, 110, 23);
+		IssuedRentals.add(btnReturnRentalIssuedRentals);
+
+		LogoPanelIssuedRentals = new JPanel();
+		LogoPanelIssuedRentals.setLayout(null);
+		LogoPanelIssuedRentals.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "",
+
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		LogoPanelIssuedRentals.setBounds(432, 11, 232, 95);
+		IssuedRentals.add(LogoPanelIssuedRentals);
+
+		lblLogoNameIssuedRentals = new JLabel("Ultra-Vision");
+		lblLogoNameIssuedRentals.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogoNameIssuedRentals.setFont(new Font("Segoe Script", Font.BOLD, 30));
+		lblLogoNameIssuedRentals.setBounds(6, 16, 220, 49);
+		LogoPanelIssuedRentals.add(lblLogoNameIssuedRentals);
+
+		lblLogoCityNameIssuedRentals = new JLabel("Dublin.");
+		lblLogoCityNameIssuedRentals.setFont(new Font("Segoe Print", Font.PLAIN, 14));
+		lblLogoCityNameIssuedRentals.setBounds(177, 62, 49, 26);
+		LogoPanelIssuedRentals.add(lblLogoCityNameIssuedRentals);
+	}
+	
 	public App(Staff staff) {
 
 		setResizable(false);
@@ -1715,8 +1859,8 @@ public class App extends JFrame {
 		EditCustomerGUI();
 		SearchTitleGUI();
 		AddTitleGUI();
-
 		IssueRentalGUI();
+		IssuedRentalsGUI();
 		setVisible(true);
 	}
 

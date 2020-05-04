@@ -6,7 +6,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/jarra/Desktop/MAIN JAVA/UltraVision/Resources/rs2xml.jar"/>
-	<classpathentry kind="lib" path="C:/Users/jarra/Desktop/MAIN JAVA/UltraVision/Resources/sqljdbc42.jar"/>
+	<classpathentry kind="lib" path="C:/Users/danish&apos;z/eclipse-workspace/Project-Jarrar/Resources/rs2xml.jar"/>
+	<classpathentry kind="lib" path="C:/Users/danish&apos;z/eclipse-workspace/Project-Jarrar/Resources/sqljdbc42.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

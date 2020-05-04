@@ -28,7 +28,21 @@ public class TransactionDao {
 		}
 	}
 
-	
+	public ResultSet getTransactions(int id) {
+		try {
+			String query = "select t.ID as ID,p.TITL as Title,p.ID as 'Title ID',s.NME as 'Issued By',t.Status,t.IssueDate as 'Issue Date',t.ReturnDate as 'Return Date' from Transactions t\r\n" + 
+					"left join Products p on t.ProductID = p.ID\r\n" + 
+					"left join Customer c on t.CustomerID = c.ID\r\n" + 
+					"left join Staff s on t.StaffID = s.ID where CustomerID = " + id;
+			PreparedStatement pstmt = con.prepareStatement(query);
+
+			ResultSet rs = pstmt.executeQuery();
+			return rs;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
 	
 	public int getIssuedCount(int id) {
 		try {
@@ -53,6 +67,23 @@ public class TransactionDao {
 			ex.printStackTrace();
 			return 0; 
 		}
+	}
+	
+	
+	public boolean markReturn(int id,String returnTime) {
+		try {
+
+			String query = "UPDATE Transactions SET Status = 'Returned', ReturnDate = '"+returnTime+"' WHERE ID =" + id;
+
+			PreparedStatement pstmt = con.prepareStatement(query);
+			pstmt.execute();
+
+			return true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+
 	}
 
 	
