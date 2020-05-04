@@ -46,4 +46,52 @@ public class CustomerDao {
 		}
 	}
 	
+	public boolean updateLoyaltyPoints(int id) {
+		try {
+			
+			String query = "UPDATE Customer SET LYLTY_PNTS = LYLTY_PNTS + 10 WHERE ID ="+id;
+			PreparedStatement pstmt = con.prepareStatement(query);
+			pstmt.execute();
+
+			return true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+	
+	
+	public ResultSet getLoyaltyPoints(int id) {
+		try {
+			String query = "select LYLTY_PNTS from Customer where ID = "+id;
+			PreparedStatement pstmt = con.prepareStatement(query);
+
+			ResultSet rs = pstmt.executeQuery();
+//			while(rs.next()) {
+//				System.out.println(rs.getString("LYLTY_PNTS"));
+//			}
+			return rs;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	
+	public boolean redeemLoyaltyPoints(int id) {
+		try {
+			
+			String query = "UPDATE Customer SET LYLTY_PNTS = LYLTY_PNTS - 100 WHERE ID ="+id;
+			System.out.println(query);
+			PreparedStatement pstmt = con.prepareStatement(query);
+			pstmt.execute();
+
+			return true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+	
 }

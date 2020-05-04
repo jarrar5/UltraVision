@@ -9,16 +9,23 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.DefaultEditorKit.CutAction;
 
 import DataAccess.ComboBoxData;
 import DataAccess.CustomerDao;
 import DataAccess.ProductDao;
+import DataAccess.TransactionDao;
+import Helpers.Adapter;
 import Helpers.InputValidation;
 import Models.Customer;
 import Models.Product;
 import Models.Staff;
+import Models.Transaction;
+import net.proteanit.sql.DbUtils;
+
 import java.awt.CardLayout;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -32,7 +39,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.awt.Color;
+import java.awt.Component;
+
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
@@ -102,6 +113,15 @@ public class App extends JFrame {
 			bandField, organiserField;
 	private JComboBox<String> FormatTypeCombo, TitleTypeCombo;
 
+	// Issue Rental
+	private JPanel IssueRental, LogoPanelIssueRental, TitleTablePanelIssueRental;
+	private JLabel lblIssueRental, lblNameIssueRental, lblLogoNameIssueRental, lblLogoCityNameIssueRental,
+			lblSelectedTitleIssueRental, lblSelectedTitleNameIssueRental, lblCustomerNameIssueRental;
+	private JScrollPane TitleTableScrollPaneIssueRental;
+	private JTable TitleTableIssueRental;
+	private JTextField searchTitleFieldIssueRental;
+	private JButton btnSearchTitleIssueRental, btnIssueIssueRental, btnGoBackProfileIssueRental;
+
 	// Initializations
 	String[] accesslvl = { "--Select Access Level Type--", "Music Lovers", "Premium", "TV Lover", "Video Lovers" };
 	String[] subscription = { "--Select Subscription Type--", "Basic", "Delux", "Premium", "Standard" };
@@ -117,7 +137,14 @@ public class App extends JFrame {
 
 	private CustomerDao customerDao = new CustomerDao();
 	private ProductDao productDao = new ProductDao();
+	private TransactionDao transactionDao = new TransactionDao();
 
+	private Adapter adapter = new Adapter();
+	
+	private JPanel warningPanelIssueRental;
+	private JLabel lblCantIssue;
+	private JLabel lblLimitReached;
+	
 	private InputValidation inputValidation;
 
 	public void switchPanels(JPanel panel) {
@@ -127,6 +154,21 @@ public class App extends JFrame {
 		layeredPane.revalidate();
 	}
 
+	public void resizeColumnWidth(JTable table) {
+	    final TableColumnModel columnModel = table.getColumnModel();
+	    for (int column = 0; column < table.getColumnCount(); column++) {
+	        int width = 15; // Min width
+	        for (int row = 0; row < table.getRowCount(); row++) {
+	            TableCellRenderer renderer = table.getCellRenderer(row, column);
+	            Component comp = table.prepareRenderer(renderer, row, column);
+	            width = Math.max(comp.getPreferredSize().width +1 , width);
+	        }
+	        if(width > 300)
+	            width=300;
+	        columnModel.getColumn(column).setPreferredWidth(width);
+	    }
+	}
+	
 	public void InstanciateApp(Staff staff) {
 		ActiveStaff = staff;
 		inputValidation = new InputValidation();
@@ -662,7 +704,42 @@ public class App extends JFrame {
 		btnIssueNewRentalProfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				
+				switch (customer.getSBSC()) {
+				case ("Basic"):
+					if (transactionDao.getIssuedCount(customer.getID()) >= 2) {
+						btnIssueIssueRental.setEnabled(false);
+						warningPanelIssueRental.setVisible(true);
+					} else {
+						btnIssueIssueRental.setEnabled(true);
+						warningPanelIssueRental.setVisible(false);
+					}
+					break;
+				case ("Standard"):
+					if (transactionDao.getIssuedCount(customer.getID()) >= 4) {
+						btnIssueIssueRental.setEnabled(false);
+						warningPanelIssueRental.setVisible(true);
+					} else {
+						btnIssueIssueRental.setEnabled(true);
+						warningPanelIssueRental.setVisible(false);
+					}
+					break;
+				case ("Delux"):
+					if (transactionDao.getIssuedCount(customer.getID()) >= 8) {
+						btnIssueIssueRental.setEnabled(false);
+						warningPanelIssueRental.setVisible(true);
+					} else {
+						btnIssueIssueRental.setEnabled(true);
+						warningPanelIssueRental.setVisible(false);
+					}
+					break;
+				case ("Premium"):
+					System.out.println("Premium");
+					break;
+				}
+
+				lblCustomerNameIssueRental.setText(lblNameCustProfile.getText());
+				index = -1;
+				switchPanels(IssueRental);
 			}
 		});
 
@@ -1352,6 +1429,279 @@ public class App extends JFrame {
 		AddTitle.add(lblTitleDetails);
 	}
 
+	private void IssueRentalGUI() {
+		IssueRental = new JPanel();
+		layeredPane.add(IssueRental, "name_2750947078941900");
+		IssueRental.setLayout(null);
+
+		lblIssueRental = new JLabel("Issue Rental");
+		lblIssueRental.setFont(new Font("Tahoma", Font.BOLD, 26));
+		lblIssueRental.setBounds(10, 11, 170, 32);
+		IssueRental.add(lblIssueRental);
+
+		searchTitleFieldIssueRental = new JTextField();
+		searchTitleFieldIssueRental.setBounds(20, 54, 210, 20);
+		IssueRental.add(searchTitleFieldIssueRental);
+		searchTitleFieldIssueRental.setColumns(10);
+
+		btnSearchTitleIssueRental = new JButton("Search Title");
+		btnSearchTitleIssueRental.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				lblSelectedTitleIssueRental.setVisible(false);
+				lblSelectedTitleNameIssueRental.setVisible(false);
+				if (searchTitleFieldIssueRental.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(rootPane, "Fill all the Fields!!!");
+				} else if (!inputValidation.validateAlphabets(searchTitleFieldIssueRental.getText())) {
+					JOptionPane.showMessageDialog(rootPane, "Details invalid");
+				} else {
+					try {
+						switch (customer.getACCS_LVL()) {
+						case "Premium":
+							if (!productDao.getProducts(searchTitleFieldIssueRental.getText()).next()) {
+								TitleTablePanelIssueRental.setVisible(false);
+								index = -1;
+								JOptionPane.showMessageDialog(rootPane, "No Record Found");
+							} else {
+								TitleTableIssueRental.setModel(DbUtils.resultSetToTableModel(
+										productDao.getProducts(searchTitleFieldIssueRental.getText())));
+								resizeColumnWidth(TitleTableIssueRental);
+								TitleTablePanelIssueRental.setVisible(true);
+							}
+							break;
+
+						default:
+							if (!productDao.getProductsCust(searchTitleFieldIssueRental.getText(),
+									adapter.translateAccessLvl(customer.getACCS_LVL())).next()) {
+								TitleTablePanelIssueRental.setVisible(false);
+								index = -1;
+								JOptionPane.showMessageDialog(rootPane, "No Record Found");
+							} else {
+								TitleTableIssueRental.setModel(DbUtils.resultSetToTableModel(
+										productDao.getProductsCust(searchTitleFieldIssueRental.getText(),
+												adapter.translateAccessLvl(customer.getACCS_LVL()))));
+								resizeColumnWidth(TitleTableIssueRental);
+								TitleTablePanelIssueRental.setVisible(true);
+							}
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+
+				}
+			}
+		});
+		btnSearchTitleIssueRental.setBounds(65, 85, 120, 23);
+		IssueRental.add(btnSearchTitleIssueRental);
+
+		lblNameIssueRental = new JLabel("Customer Name");
+		lblNameIssueRental.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNameIssueRental.setBounds(260, 36, 130, 14);
+		IssueRental.add(lblNameIssueRental);
+
+		lblCustomerNameIssueRental = new JLabel("");
+		lblCustomerNameIssueRental.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCustomerNameIssueRental.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		lblCustomerNameIssueRental.setBounds(260, 50, 130, 30);
+		IssueRental.add(lblCustomerNameIssueRental);
+
+		lblSelectedTitleIssueRental = new JLabel("Selected Title");
+		lblSelectedTitleIssueRental.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSelectedTitleIssueRental.setVisible(false);
+		lblSelectedTitleIssueRental.setBounds(260, 91, 130, 14);
+		IssueRental.add(lblSelectedTitleIssueRental);
+
+		lblSelectedTitleNameIssueRental = new JLabel("");
+		lblSelectedTitleNameIssueRental.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSelectedTitleNameIssueRental.setVisible(false);
+		lblSelectedTitleNameIssueRental.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		lblSelectedTitleNameIssueRental.setBounds(260, 107, 130, 30);
+		IssueRental.add(lblSelectedTitleNameIssueRental);
+
+		TitleTablePanelIssueRental = new JPanel();
+		TitleTablePanelIssueRental.setVisible(false);
+		TitleTablePanelIssueRental.setBounds(10, 162, 534, 176);
+		IssueRental.add(TitleTablePanelIssueRental);
+		TitleTablePanelIssueRental.setLayout(null);
+
+		TitleTableScrollPaneIssueRental = new JScrollPane();
+		TitleTableScrollPaneIssueRental.setBounds(0, 0, 534, 176);
+		TitleTablePanelIssueRental.add(TitleTableScrollPaneIssueRental);
+
+		TitleTableIssueRental = new JTable();
+		TitleTableScrollPaneIssueRental.setViewportView(TitleTableIssueRental);
+		TitleTableIssueRental.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				index = TitleTableIssueRental.getSelectedRow();
+				model = TitleTableIssueRental.getModel();
+				System.out.println(model.getValueAt(index, 0));
+				lblSelectedTitleIssueRental.setVisible(true);
+				lblSelectedTitleNameIssueRental.setText(model.getValueAt(index, 1).toString());
+				lblSelectedTitleNameIssueRental.setVisible(true);
+			}
+		});
+
+		btnIssueIssueRental = new JButton("Issue");
+		btnIssueIssueRental.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				if (index != -1) {
+					int input = JOptionPane.showConfirmDialog(rootPane,
+							"Issue " + model.getValueAt(index, 1).toString() + " to " + lblNameCustProfile.getText(),
+							"Select an Option...", JOptionPane.YES_NO_OPTION);
+					// 0=yes, 1=no, 2=cancel
+					if (input == 0) {
+						Transaction t = new Transaction();
+						t.setCustomerID(Integer.parseInt(lblidCustProfile.getText()));
+						t.setProductID(Integer.parseInt(model.getValueAt(index, 0).toString()));
+						t.setStaffID(ActiveStaff.getId());
+
+						transactionDao.addTransaction(t);
+
+						productDao.decrement(t.getProductID());
+
+						customerDao.updateLoyaltyPoints(Integer.parseInt(lblidCustProfile.getText()));
+
+						ResultSet rs = customerDao.getLoyaltyPoints(customer.getID());
+						try {
+							while (rs.next()) {
+								customer.setLYLTY_PNTS(Integer.parseInt(rs.getString("LYLTY_PNTS")));
+								lblLoyaltyPointsCustProfile.setText(rs.getString("LYLTY_PNTS"));
+							}
+						} catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
+						if (redeemFlag) {
+							customerDao.redeemLoyaltyPoints(customer.getID());
+						}
+
+						searchTitleFieldIssueRental.setText(null);
+						TitleTablePanelIssueRental.setVisible(false);
+						JOptionPane.showMessageDialog(rootPane, "Rental Issued Successfully");
+						System.out.println("Count = " + transactionDao.getIssuedCount(customer.getID()));
+
+						switch (customer.getSBSC()) {
+						case ("Basic"):
+							System.out.println("Basic");
+							if (transactionDao.getIssuedCount(customer.getID()) >= 2) {
+								btnIssueIssueRental.setEnabled(false);
+								warningPanelIssueRental.setVisible(true);
+							} else {
+								btnIssueIssueRental.setEnabled(true);
+								warningPanelIssueRental.setVisible(false);
+							}
+							break;
+						case ("Standard"):
+							System.out.println("Standard");
+							if (transactionDao.getIssuedCount(customer.getID()) >= 4) {
+								btnIssueIssueRental.setEnabled(false);
+								warningPanelIssueRental.setVisible(true);
+							} else {
+								btnIssueIssueRental.setEnabled(true);
+								warningPanelIssueRental.setVisible(false);
+							}
+							break;
+						case ("Delux"):
+							System.out.println("Delux");
+							if (transactionDao.getIssuedCount(customer.getID()) >= 8) {
+								btnIssueIssueRental.setEnabled(false);
+								warningPanelIssueRental.setVisible(true);
+							} else {
+								btnIssueIssueRental.setEnabled(true);
+								warningPanelIssueRental.setVisible(false);
+							}
+							break;
+						case ("Premium"):
+							System.out.println("Premium");
+							break;
+						}
+					}
+					lblSelectedTitleIssueRental.setVisible(false);
+					lblSelectedTitleNameIssueRental.setVisible(false);
+					TitleTableIssueRental.clearSelection();
+					index = -1;
+				} else {
+					JOptionPane.showMessageDialog(rootPane, "No Item Selected");
+				}
+			}
+		});
+
+		btnGoBackProfileIssueRental = new JButton("Go Back");
+		btnGoBackProfileIssueRental.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				ResultSet rs = customerDao.getLoyaltyPoints(customer.getID());
+				try {
+					while (rs.next()) {
+						System.out.println(rs.getString("LYLTY_PNTS"));
+						customer.setLYLTY_PNTS(Integer.parseInt(rs.getString("LYLTY_PNTS")));
+						lblLoyaltyPointsCustProfile.setText(rs.getString("LYLTY_PNTS"));
+					}
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				if (customer.getLYLTY_PNTS() >= 100) {
+					btnRedeemLoyaltyPoints.setVisible(true);
+				} else {
+					btnRedeemLoyaltyPoints.setVisible(false);
+				}
+				searchTitleFieldIssueRental.setText(null);
+				lblSelectedTitleIssueRental.setVisible(false);
+				lblSelectedTitleNameIssueRental.setVisible(false);
+				model = null;
+				TitleTableIssueRental.setModel(new DefaultTableModel());
+				index = -1;
+				TitleTablePanelIssueRental.setVisible(false);
+				switchPanels(Profile);
+			}
+		});
+		btnGoBackProfileIssueRental.setBounds(554, 209, 110, 23);
+		IssueRental.add(btnGoBackProfileIssueRental);
+		btnIssueIssueRental.setBounds(554, 243, 110, 23);
+		IssueRental.add(btnIssueIssueRental);
+
+		LogoPanelIssueRental = new JPanel();
+		LogoPanelIssueRental.setLayout(null);
+		LogoPanelIssueRental.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "",
+
+				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		LogoPanelIssueRental.setBounds(435, 11, 232, 95);
+		IssueRental.add(LogoPanelIssueRental);
+
+		lblLogoNameIssueRental = new JLabel("Ultra-Vision");
+		lblLogoNameIssueRental.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogoNameIssueRental.setFont(new Font("Segoe Script", Font.BOLD, 30));
+		lblLogoNameIssueRental.setBounds(6, 16, 220, 49);
+		LogoPanelIssueRental.add(lblLogoNameIssueRental);
+
+		lblLogoCityNameIssueRental = new JLabel("Dublin.");
+		lblLogoCityNameIssueRental.setFont(new Font("Segoe Print", Font.PLAIN, 14));
+		lblLogoCityNameIssueRental.setBounds(177, 62, 49, 26);
+		LogoPanelIssueRental.add(lblLogoCityNameIssueRental);
+
+		warningPanelIssueRental = new JPanel();
+		warningPanelIssueRental
+				.setToolTipText("You have reached your issuing limit.\nRetun previous or upade plan to issue more.");
+		warningPanelIssueRental.setVisible(false);
+		warningPanelIssueRental.setBounds(554, 277, 110, 41);
+		IssueRental.add(warningPanelIssueRental);
+		warningPanelIssueRental.setLayout(null);
+
+		lblCantIssue = new JLabel("Can't Issue.");
+		lblCantIssue.setBounds(0, 0, 110, 20);
+		warningPanelIssueRental.add(lblCantIssue);
+		lblCantIssue.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblCantIssue.setHorizontalAlignment(SwingConstants.CENTER);
+
+		lblLimitReached = new JLabel("Limit Reached.");
+		lblLimitReached.setBounds(0, 21, 110, 20);
+		warningPanelIssueRental.add(lblLimitReached);
+		lblLimitReached.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLimitReached.setFont(new Font("Tahoma", Font.BOLD, 14));
+	}
+
 	public App(Staff staff) {
 
 		setResizable(false);
@@ -1365,7 +1715,9 @@ public class App extends JFrame {
 		EditCustomerGUI();
 		SearchTitleGUI();
 		AddTitleGUI();
-		
+
+		IssueRentalGUI();
 		setVisible(true);
 	}
+
 }
