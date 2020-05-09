@@ -33,6 +33,7 @@ public class Login extends JFrame {
 	private JTextField nameFieldReg;
 	private JTextField phoneFieldReg;
 	private InputValidation inputValidation = new InputValidation();
+	private JPasswordField masterpasswordFieldReg;
 
 	public Login() {
 		setTitle("Login Active");
@@ -141,29 +142,40 @@ public class Login extends JFrame {
 		btnRegister.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (usernameFieldReg.getText().isEmpty() || passwordFieldReg.getText().isEmpty()
-						|| nameFieldReg.getText().isEmpty() || phoneFieldReg.getText().isEmpty()) {
+						|| nameFieldReg.getText().isEmpty() || phoneFieldReg.getText().isEmpty()
+						|| masterpasswordFieldReg.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(rootPane, "Fill all Fields");
 				} else if (!inputValidation.validateAlphabets(nameFieldReg.getText())
 						|| !inputValidation.validateNumbers(phoneFieldReg.getText())) {
 					JOptionPane.showMessageDialog(rootPane, "Details are not Valid");
 				} else {
-					Staff staff = new Staff();
-					
-					staff.setName(nameFieldReg.getText());
-					staff.setPHNE(Long.parseLong(phoneFieldReg.getText()));
-					staff.setUsername(usernameFieldReg.getText());
-					staff.setPassword(passwordFieldReg.getText());
-					
-					staffDao.register(staff);
-					JOptionPane.showMessageDialog(rootPane, "Registered Successfully");
-					nameFieldReg.setText(null);
-					phoneFieldReg.setText(null);
-					usernameFieldReg.setText(null);
-					passwordFieldReg.setText(null);
+					if(phoneFieldReg.getText().length() > 16) {
+						JOptionPane.showMessageDialog(rootPane, "Phone length exceeds the Limit");
+					} else {
+						if (masterpasswordFieldReg.getText().equals("addnewstaff")) {
+							Staff staff = new Staff();
+
+							staff.setName(nameFieldReg.getText());
+							staff.setPHNE(Long.parseLong(phoneFieldReg.getText()));
+							staff.setUsername(usernameFieldReg.getText());
+							staff.setPassword(passwordFieldReg.getText());
+
+							staffDao.register(staff);
+							JOptionPane.showMessageDialog(rootPane, "Registered Successfully");
+							staff = new Staff();
+							nameFieldReg.setText(null);
+							phoneFieldReg.setText(null);
+							usernameFieldReg.setText(null);
+							passwordFieldReg.setText(null);
+							masterpasswordFieldReg.setText(null);
+						} else {
+							JOptionPane.showMessageDialog(rootPane, "Master Password Incorrect");
+						}
+					}
 				}
 			}
 		});
-		btnRegister.setBounds(244, 118, 89, 23);
+		btnRegister.setBounds(401, 118, 89, 23);
 		panel_2.add(btnRegister);
 
 		passwordFieldReg = new JPasswordField();
@@ -189,6 +201,15 @@ public class Login extends JFrame {
 		phoneFieldReg.setBounds(380, 73, 126, 20);
 		panel_2.add(phoneFieldReg);
 		phoneFieldReg.setColumns(10);
+
+		masterpasswordFieldReg = new JPasswordField();
+		masterpasswordFieldReg.setBounds(64, 121, 126, 20);
+		panel_2.add(masterpasswordFieldReg);
+
+		JLabel lblMasterPassword = new JLabel("Master Password");
+		lblMasterPassword.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		lblMasterPassword.setBounds(54, 104, 110, 14);
+		panel_2.add(lblMasterPassword);
 
 		passwordField = new JPasswordField();
 		passwordField.setBounds(162, 87, 200, 20);
